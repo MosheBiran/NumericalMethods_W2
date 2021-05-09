@@ -35,8 +35,11 @@ def gaussian(x, mu, sig):
     return np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
 def multiGaussian(g1,g2):
     return g1*g2
+
+t=1
+gr=0.05
 for i in range(6):
-    x_values = np.linspace(-10, 10, 60)
+    x_values = np.linspace(-10, 10, 120)
     y_values = np.linspace(-10, 10, 120)
     X, Y = np.meshgrid(x_values, y_values)
     mu1=random.uniform(-5, 5)
@@ -49,7 +52,12 @@ for i in range(6):
 
     '''for mu, sig in [(-2, 0.5), (0, 0.15)]:
         plt.plot(x_values, gaussian(x_values, mu, sig))'''
-    z=multiGaussian(g1,g2)*r**i
+    z=multiGaussian(g1,g2)*t
+    if(t==1):
+        t=r
+    else:
+        t=r*(1-gr)
+        gr+=0.05
 
     surf=ax.plot_surface(X, Y, z, rstride=1, cstride=1, cmap='coolwarm', edgecolor='none')
 ax.set_xlabel('x')
