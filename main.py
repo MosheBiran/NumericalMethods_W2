@@ -45,9 +45,9 @@ for i in range(6):
     X, Y = np.meshgrid(x_values, y_values)
     mu1=random.uniform(-5, 5)
     mu2=random.uniform(-5, 5)
-    var1=random.uniform(0.56, 0.6)
+    var1=random.uniform(0.06, 0.6)
     se1= var1 ** 0.5
-    var2=random.uniform(0.56, 0.6)
+    var2=random.uniform(0.06, 0.6)
     se2 = var2 ** 0.5
     g1=gaussian(X,mu1,se1)
     g2=gaussian(Y,mu2,se2)
