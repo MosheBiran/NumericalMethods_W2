@@ -38,28 +38,32 @@ def multiGaussian(g1,g2):
 
 t=1
 gr=0.05
+z=1
 for i in range(6):
     x_values = np.linspace(-10, 10, 120)
     y_values = np.linspace(-10, 10, 120)
     X, Y = np.meshgrid(x_values, y_values)
     mu1=random.uniform(-5, 5)
     mu2=random.uniform(-5, 5)
-    se1=random.uniform(0.06, 0.6)
-    se2=random.uniform(0.06, 0.6)
-
+    var1=random.uniform(0.06, 0.6)
+    se1= var1 ** 0.5
+    var2=random.uniform(0.06, 0.6)
+    se2 = var2 ** 0.5
     g1=gaussian(X,mu1,se1)
     g2=gaussian(Y,mu2,se2)
 
     '''for mu, sig in [(-2, 0.5), (0, 0.15)]:
         plt.plot(x_values, gaussian(x_values, mu, sig))'''
-    z=multiGaussian(g1,g2)*t
+
     if(t==1):
+        z = multiGaussian(g1, g2) * t
         t=r
     else:
+        z += multiGaussian(g1, g2) * t
         t=r*(1-gr)
         gr+=0.05
 
-    surf=ax.plot_surface(X, Y, z, rstride=1, cstride=1, cmap='coolwarm', edgecolor='none')
+surf=ax.plot_surface(X, Y, z, rstride=1, cstride=1, cmap='coolwarm', edgecolor='none')
 ax.set_xlabel('x')
 ax.set_ylabel('y')
 ax.set_zlabel('PDF')
