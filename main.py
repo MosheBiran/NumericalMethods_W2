@@ -32,7 +32,7 @@ ax = plt.axes(projection='3d')
 
 
 def gaussian(x, mu, sig):
-    return 1.0001*np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
+    return 1.01*np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
 def multiGaussian(g1,g2):
     return g1*g2
 
