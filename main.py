@@ -32,7 +32,7 @@ ax = plt.axes(projection='3d')
 
 
 def gaussian(x, mu, sig):
-    return np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
+    return 1.0001*np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
 def multiGaussian(g1,g2):
     return g1*g2
 
@@ -45,9 +45,9 @@ for i in range(6):
     X, Y = np.meshgrid(x_values, y_values)
     mu1=random.uniform(-5, 5)
     mu2=random.uniform(-5, 5)
-    var1=random.uniform(0.06, 0.6)
+    var1=random.uniform(0.56, 0.6)
     se1= var1 ** 0.5
-    var2=random.uniform(0.06, 0.6)
+    var2=random.uniform(0.56, 0.6)
     se2 = var2 ** 0.5
     g1=gaussian(X,mu1,se1)
     g2=gaussian(Y,mu2,se2)
@@ -59,7 +59,7 @@ for i in range(6):
         z = multiGaussian(g1, g2) * t
         t=r
     else:
-        z += multiGaussian(g1, g2) * t
+        z = np.maximum(z,multiGaussian(g1, g2) * t)
         t=r*(1-gr)
         gr+=0.05
 
