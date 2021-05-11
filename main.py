@@ -32,10 +32,10 @@ ax = plt.axes(projection='3d')
 
 
 def gaussian(x, mu, sig):
-    return 1.01*np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
+    return np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
 def multiGaussian(g1,g2):
     return g1*g2
-
+random.seed(1000)
 t=1
 gr=0.05
 z=1
@@ -72,7 +72,7 @@ ax.set_title('Surface plot of Gaussian 2D KDE')
 ax.view_init(15, 45)
 plt.show()
 
-
+OriginalHC()
 
 
 '''# Our 2-dimensional distribution will be over variables X and Y
