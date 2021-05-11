@@ -4,6 +4,9 @@ from opfunu.cec_basic.cec2014_nobias import *
 from mealpy.swarm_based.PSO import BasePSO, PPSO, PSO_W, HPSO_TVA
 from mealpy.math_based.HC import OriginalHC
 from mealpy.swarm_based.GWO import BaseGWO
+from mealpy.swarm_based.WOA import BaseWOA
+from mealpy.swarm_based.EHO import BaseEHO
+from mealpy.physics_based.SA import BaseSA
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -107,7 +110,7 @@ def gusiianfuncc( lst, sol):
   for j in range(len(sol)):
     g*=gaussian(sol[j],lst[0][j][0],lst[0][j][1])
   return g*lst[1]
-def hc(dem=2):
+def hc(dem=2,r=0.3):
     list = []
     random.seed(13)
     t = 1
@@ -140,7 +143,7 @@ def hc(dem=2):
 
     obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
     verbose = True  # Print out the training results
-    epoch = 1000  # Number of iterations / generations / epochs
+    epoch = 10  # Number of iterations / generations / epochs
     pop_size = 50  # Populations size (Number of individuals / Number of solutions)
 
     # A - Different way to provide lower bound and upper bound. Here are some examples:
@@ -152,12 +155,13 @@ def hc(dem=2):
     md1 = OriginalHC(obj_func, lb1, ub1, verbose, epoch, pop_size)
     best_pos1, best_fit1, list_loss1 = md1.train()
     print(best_pos1)
-    wha=(np.array(list_loss1)*-1).reshape(-1,1)
+    '''wha=(np.array(list_loss1)).reshape(-1,2)
+    wha[:,1]=wha[:,1]*-1
     np.savetxt("GFG.csv",
                wha,
                delimiter=", ",
-               fmt='% s')
-def gwo(dem=2):
+               fmt='% s')'''
+def gwo(dem=2,r=0.3):
     list = []
     random.seed(13)
     t = 1
@@ -190,7 +194,7 @@ def gwo(dem=2):
 
     obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
     verbose = True  # Print out the training results
-    epoch = 100  # Number of iterations / generations / epochs
+    epoch = 10  # Number of iterations / generations / epochs
     pop_size = 50  # Populations size (Number of individuals / Number of solutions)
 
     # A - Different way to provide lower bound and upper bound. Here are some examples:
@@ -202,9 +206,267 @@ def gwo(dem=2):
     md1 = BaseGWO(obj_func, lb1, ub1, verbose, epoch, pop_size)
     best_pos1, best_fit1, list_loss1 = md1.train()
     print(best_pos1)
-    wha=(np.array(list_loss1)*-1).reshape(-1,1)
+    '''wha = (np.array(list_loss1)).reshape(-1, 2)
+    wha[:, 1] = wha[:, 1] * -1
     np.savetxt("GFG.csv",
                wha,
                delimiter=", ",
-               fmt='% s')
-gwo(10)
+               fmt='% s')'''
+
+
+def pso(dem=2,r=0.3):
+    list = []
+    random.seed(13)
+    t = 1
+    gr = 0.05
+    z = 1
+    gussiandemlist=[]
+    for i in range(6):
+        gusdem=[]
+        for j in range(dem):
+            gus1d = []
+            gus1d.append(random.uniform(-d*ul/2, d*ul/2))
+            gus1d.append(random.uniform(w*ul/10,+w*ul))
+            gusdem.append(gus1d)
+
+        if(t==1):
+            #z = gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r
+        else:
+            #z =  gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r*(1-gr)
+            gr+=0.05
+    def targetfunc(solution):
+        templist=[]
+        for f in gussiandemlist:
+            templist.append(gusiianfuncc(f,solution)**(1/dem))
+        list.append([solution,max(templist)])
+        return -max(templist)
+
+    obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
+    verbose = True  # Print out the training results
+    epoch = 10  # Number of iterations / generations / epochs
+    pop_size = 50  # Populations size (Number of individuals / Number of solutions)
+
+    # A - Different way to provide lower bound and upper bound. Here are some examples:
+
+    ## 1. When you have different lower bound and upper bound for each variables
+    lb1 = [-1*ul/2]*dem
+    ub1 = [ul/2]*dem
+
+    md1 = BasePSO(obj_func, lb1, ub1, verbose, epoch, pop_size)
+    best_pos1, best_fit1, list_loss1 = md1.train()
+    print(best_pos1)
+    '''wha = (np.array(list_loss1)).reshape(-1, 2)
+    wha[:, 1] = wha[:, 1] * -1
+    np.savetxt("GFG.csv",
+               wha,
+               delimiter=", ",
+               fmt='% s')'''
+def sa(dem=2,r=0.3):
+    list = []
+    random.seed(13)
+    t = 1
+    gr = 0.05
+    z = 1
+    gussiandemlist=[]
+    for i in range(6):
+        gusdem=[]
+        for j in range(dem):
+            gus1d = []
+            gus1d.append(random.uniform(-d*ul/2, d*ul/2))
+            gus1d.append(random.uniform(w*ul/10,+w*ul))
+            gusdem.append(gus1d)
+
+        if(t==1):
+            #z = gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r
+        else:
+            #z =  gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r*(1-gr)
+            gr+=0.05
+    def targetfunc(solution):
+        templist=[]
+        for f in gussiandemlist:
+            templist.append(gusiianfuncc(f,solution)**(1/dem))
+        list.append([solution,max(templist)])
+        return -max(templist)
+
+    obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
+    verbose = True  # Print out the training results
+    epoch = 10  # Number of iterations / generations / epochs
+    pop_size = 50  # Populations size (Number of individuals / Number of solutions)
+
+    # A - Different way to provide lower bound and upper bound. Here are some examples:
+
+    ## 1. When you have different lower bound and upper bound for each variables
+    lb1 = [-1*ul/2]*dem
+    ub1 = [ul/2]*dem
+
+    md1 = BaseSA(obj_func, lb1, ub1, verbose, epoch, pop_size)
+    best_pos1, best_fit1, list_loss1 = md1.train()
+    print(best_pos1)
+    '''wha = (np.array(list_loss1)).reshape(-1, 2)
+    wha[:, 1] = wha[:, 1] * -1
+    np.savetxt("GFG.csv",
+               wha,
+               delimiter=", ",
+               fmt='% s')'''
+def woa(dem=2,r=0.3):
+    list = []
+    random.seed(13)
+    t = 1
+    gr = 0.05
+    z = 1
+    gussiandemlist=[]
+    for i in range(6):
+        gusdem=[]
+        for j in range(dem):
+            gus1d = []
+            gus1d.append(random.uniform(-d*ul/2, d*ul/2))
+            gus1d.append(random.uniform(w*ul/10,+w*ul))
+            gusdem.append(gus1d)
+
+        if(t==1):
+            #z = gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r
+        else:
+            #z =  gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r*(1-gr)
+            gr+=0.05
+    def targetfunc(solution):
+        templist=[]
+        for f in gussiandemlist:
+            templist.append(gusiianfuncc(f,solution)**(1/dem))
+        list.append([solution,max(templist)])
+        return -max(templist)
+
+    obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
+    verbose = True  # Print out the training results
+    epoch = 10  # Number of iterations / generations / epochs
+    pop_size = 50  # Populations size (Number of individuals / Number of solutions)
+
+    # A - Different way to provide lower bound and upper bound. Here are some examples:
+
+    ## 1. When you have different lower bound and upper bound for each variables
+    lb1 = [-1*ul/2]*dem
+    ub1 = [ul/2]*dem
+
+    md1 = BaseWOA(obj_func, lb1, ub1, verbose, epoch, pop_size)
+    best_pos1, best_fit1, list_loss1 = md1.train()
+    print(best_pos1)
+    '''wha = (np.array(list_loss1)).reshape(-1, 2)
+    wha[:, 1] = wha[:, 1] * -1
+    np.savetxt("GFG.csv",
+               wha,
+               delimiter=", ",
+               fmt='% s')'''
+def woa(dem=2,r=0.3):
+    list = []
+    random.seed(13)
+    t = 1
+    gr = 0.05
+    z = 1
+    gussiandemlist=[]
+    for i in range(6):
+        gusdem=[]
+        for j in range(dem):
+            gus1d = []
+            gus1d.append(random.uniform(-d*ul/2, d*ul/2))
+            gus1d.append(random.uniform(w*ul/10,+w*ul))
+            gusdem.append(gus1d)
+
+        if(t==1):
+            #z = gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r
+        else:
+            #z =  gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r*(1-gr)
+            gr+=0.05
+    def targetfunc(solution):
+        templist=[]
+        for f in gussiandemlist:
+            templist.append(gusiianfuncc(f,solution)**(1/dem))
+        list.append([solution,max(templist)])
+        return -max(templist)
+
+    obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
+    verbose = True  # Print out the training results
+    epoch = 10  # Number of iterations / generations / epochs
+    pop_size = 50  # Populations size (Number of individuals / Number of solutions)
+
+    # A - Different way to provide lower bound and upper bound. Here are some examples:
+
+    ## 1. When you have different lower bound and upper bound for each variables
+    lb1 = [-1*ul/2]*dem
+    ub1 = [ul/2]*dem
+
+    md1 = BaseWOA(obj_func, lb1, ub1, verbose, epoch, pop_size)
+    best_pos1, best_fit1, list_loss1 = md1.train()
+    print(best_pos1)
+    '''wha = (np.array(list_loss1)).reshape(-1, 2)
+    wha[:, 1] = wha[:, 1] * -1
+    np.savetxt("GFG.csv",
+               wha,
+               delimiter=", ",
+               fmt='% s')'''
+def eho(dem=2,r=0.3):
+    list = []
+    random.seed(13)
+    t = 1
+    gr = 0.05
+    z = 1
+    gussiandemlist=[]
+    for i in range(6):
+        gusdem=[]
+        for j in range(dem):
+            gus1d = []
+            gus1d.append(random.uniform(-d*ul/2, d*ul/2))
+            gus1d.append(random.uniform(w*ul/10,+w*ul))
+            gusdem.append(gus1d)
+
+        if(t==1):
+            #z = gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r
+        else:
+            #z =  gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r*(1-gr)
+            gr+=0.05
+    def targetfunc(solution):
+        templist=[]
+        for f in gussiandemlist:
+            templist.append(gusiianfuncc(f,solution)**(1/dem))
+        list.append([solution,max(templist)])
+        return -max(templist)
+
+    obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
+    verbose = True  # Print out the training results
+    epoch = 10  # Number of iterations / generations / epochs
+    pop_size = 50  # Populations size (Number of individuals / Number of solutions)
+
+    # A - Different way to provide lower bound and upper bound. Here are some examples:
+
+    ## 1. When you have different lower bound and upper bound for each variables
+    lb1 = [-1*ul/2]*dem
+    ub1 = [ul/2]*dem
+
+    md1 = BaseEHO(obj_func, lb1, ub1, verbose, epoch, pop_size)
+    best_pos1, best_fit1, list_loss1 = md1.train()
+    print(best_pos1)
+    '''wha = (np.array(list_loss1)).reshape(-1, 2)
+    wha[:, 1] = wha[:, 1] * -1
+    np.savetxt("GFG.csv",
+               wha,
+               delimiter=", ",
+               fmt='% s')'''
+eho(10,0.9)
