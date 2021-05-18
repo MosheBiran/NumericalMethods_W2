@@ -7,6 +7,7 @@ from mealpy.swarm_based.GWO import BaseGWO
 from mealpy.swarm_based.WOA import BaseWOA
 from mealpy.swarm_based.EHO import BaseEHO
 from mealpy.physics_based.SA import BaseSA
+from mealpy.human_based.SSDO import BaseSSDO
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -102,7 +103,10 @@ def plot3d():
 
     x_values = np.linspace(-10, 10, 120)
     y_values = np.linspace(-10, 10, 120)
+
     x, y = np.meshgrid(x_values, y_values)
+    plt.contourf(x, y, (targetfunc([x, y])).T)
+    plt.show()
     surf = ax.plot_surface(x, y, targetfunc([x,y]), rstride=1, cstride=1, cmap='coolwarm', edgecolor='none')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
@@ -151,7 +155,7 @@ def hc(dem=2,r=0.3):
 
     obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
     verbose = True  # Print out the training results
-    epoch = 10  # Number of iterations / generations / epochs
+    epoch = 50  # Number of iterations / generations / epochs
     pop_size = 50  # Populations size (Number of individuals / Number of solutions)
 
     # A - Different way to provide lower bound and upper bound. Here are some examples:
@@ -202,7 +206,7 @@ def gwo(dem=2,r=0.3):
 
     obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
     verbose = True  # Print out the training results
-    epoch = 10  # Number of iterations / generations / epochs
+    epoch = 100  # Number of iterations / generations / epochs
     pop_size = 50  # Populations size (Number of individuals / Number of solutions)
 
     # A - Different way to provide lower bound and upper bound. Here are some examples:
@@ -255,7 +259,7 @@ def pso(dem=2,r=0.3):
 
     obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
     verbose = True  # Print out the training results
-    epoch = 10  # Number of iterations / generations / epochs
+    epoch = 100  # Number of iterations / generations / epochs
     pop_size = 50  # Populations size (Number of individuals / Number of solutions)
 
     # A - Different way to provide lower bound and upper bound. Here are some examples:
@@ -306,7 +310,7 @@ def sa(dem=2,r=0.3):
 
     obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
     verbose = True  # Print out the training results
-    epoch = 10  # Number of iterations / generations / epochs
+    epoch = 20  # Number of iterations / generations / epochs
     pop_size = 50  # Populations size (Number of individuals / Number of solutions)
 
     # A - Different way to provide lower bound and upper bound. Here are some examples:
@@ -357,7 +361,7 @@ def woa(dem=2,r=0.3):
 
     obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
     verbose = True  # Print out the training results
-    epoch = 10  # Number of iterations / generations / epochs
+    epoch = 100  # Number of iterations / generations / epochs
     pop_size = 50  # Populations size (Number of individuals / Number of solutions)
 
     # A - Different way to provide lower bound and upper bound. Here are some examples:
@@ -408,7 +412,7 @@ def woa(dem=2,r=0.3):
 
     obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
     verbose = True  # Print out the training results
-    epoch = 10  # Number of iterations / generations / epochs
+    epoch = 100  # Number of iterations / generations / epochs
     pop_size = 50  # Populations size (Number of individuals / Number of solutions)
 
     # A - Different way to provide lower bound and upper bound. Here are some examples:
@@ -459,7 +463,7 @@ def eho(dem=2,r=0.3):
 
     obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
     verbose = True  # Print out the training results
-    epoch = 10  # Number of iterations / generations / epochs
+    epoch = 100  # Number of iterations / generations / epochs
     pop_size = 50  # Populations size (Number of individuals / Number of solutions)
 
     # A - Different way to provide lower bound and upper bound. Here are some examples:
@@ -477,4 +481,57 @@ def eho(dem=2,r=0.3):
                wha,
                delimiter=", ",
                fmt='% s')'''
-hc(10,0.3)
+
+
+def ssdo(dem=2,r=0.3):
+    list = []
+    random.seed(10)
+    t = 1
+    gr = 0.05
+    z = 1
+    gussiandemlist=[]
+    for i in range(6):
+        gusdem=[]
+        for j in range(dem):
+            gus1d = []
+            gus1d.append(random.uniform(-d*ul/2, d*ul/2))
+            gus1d.append(random.uniform(w*ul/10,+w*ul))
+            gusdem.append(gus1d)
+
+        if(t==1):
+            #z = gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r
+        else:
+            #z =  gaussmultiD(mu, var)
+            gussiandemlist.append([gusdem,t])
+            t=r*(1-gr)
+            gr+=0.05
+    def targetfunc(solution):
+        templist=[]
+        for f in gussiandemlist:
+            templist.append(gusiianfuncc(f,solution))
+        list.append([solution,max(templist)])
+        return -max(templist)
+
+    obj_func = targetfunc  # This objective function come from "opfunu" library. You can design your own objective function like above
+    verbose = True  # Print out the training results
+    epoch = 100  # Number of iterations / generations / epochs
+    pop_size = 50  # Populations size (Number of individuals / Number of solutions)
+
+    # A - Different way to provide lower bound and upper bound. Here are some examples:
+
+    ## 1. When you have different lower bound and upper bound for each variables
+    lb1 = [-1*ul/2]*dem
+    ub1 = [ul/2]*dem
+
+    md1 = BaseSSDO(obj_func, lb1, ub1, verbose, epoch, pop_size)
+    best_pos1, best_fit1, list_loss1 = md1.train()
+    print(best_pos1)
+    '''wha = (np.array(list_loss1)).reshape(-1, 2)
+    wha[:, 1] = wha[:, 1] * -1
+    np.savetxt("GFG.csv",
+               wha,
+               delimiter=", ",
+               fmt='% s')'''
+plot3d()
